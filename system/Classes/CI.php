@@ -1,5 +1,25 @@
 <?php namespace CodeIgniter;
 
+/**
+ * Class CI
+ *
+ * This class acts as both a singleton and a registry for the
+ * "services" available. Services are specified through the
+ * application/config/services.php config file. Any service
+ * listed there can be accessed by its alias through $CI->{service alias}
+ *
+ * Example:
+ *      A service with alias 'logger' could be access like:
+ *
+ *      $ci = CodeIgniter\CI::getInstance();
+ *      $ci->logger->log();
+ *
+ * New services can always be added later with the register(), save_instance(),
+ * and __get() methods.
+ *
+ * @package CodeIgniter
+ * @author Lonnie Ezell (lonnie@newmythmedia.com)
+ */
 class CI {
 
     /**
@@ -54,24 +74,25 @@ class CI {
 
     /**
      * Responsible for registering all service providers with
-     * the Dependency Injection container.
+     * the Dependency Injection container. The list of services can
+     * be found in application/config/services.php
      */
     public function loadProviders()
     {
         // Load our provider map
-        if (! file_exists(APPPATH .'Config/providers.php'))
+        if (! file_exists(APPPATH .'Config/services.php'))
         {
-            show_error('The Service Providers configuration file cannot be found.');
+            throw new \RuntimeException('The Service Providers configuration file cannot be found.');
         }
 
-        include APPPATH .'Config/providers.php';
+        include APPPATH .'Config/services.php';
 
-        if (empty($config))
+        if (empty($config) || empty($config['services']))
         {
-            show_error('The Service Providers configuration file does not contain a proper array.');
+            throw new \RuntimeException('The Service Providers configuration file does not contain a proper array.');
         }
 
-        $this->providers = $config['providers'];
+        $this->providers = $config['services'];
         unset($config);
     }
 
@@ -138,7 +159,7 @@ class CI {
      *
      * @return $this
      */
-    public function save_instance($alias, &$class)
+    public function saveInstance($alias, &$class)
     {
         $alias = strtolower($alias);
 
@@ -153,15 +174,6 @@ class CI {
     }
 
     //--------------------------------------------------------------------
-
-    public static function singleton($alias)
-    {
-        return static::$instance->{$alias};
-    }
-
-    //--------------------------------------------------------------------
-
-
 
     /**
      * Creates a new instance of the service provider with $alias, and
