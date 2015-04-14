@@ -203,7 +203,7 @@ class Log implements LoggerInterface {
 
         $filepath = $this->log_path .'log-'. date('Y-m-d'). '.'. $this->file_ext;
 
-        $message = '';
+        $msg = '';
 
         if ( ! file_exists($filepath))
         {
@@ -212,7 +212,7 @@ class Log implements LoggerInterface {
             // Only add protection to php files
             if ($this->file_ext === 'php')
             {
-                $message .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
+                $msg .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
             }
         }
 
@@ -234,13 +234,13 @@ class Log implements LoggerInterface {
             $date = date($this->date_format);
         }
 
-        $message .= $level .' - '. $date .' --> '. $message ."\n";
+        $msg .= strtoupper($level) .' - '. $date .' --> '. $this->interpolate($message, $context) ."\n";
 
         flock($fp, LOCK_EX);
 
-        for ($written = 0, $length = strlen($message); $written < $length; $written += $result)
+        for ($written = 0, $length = strlen($msg); $written < $length; $written += $result)
         {
-            if (($result = fwrite($fp, substr($message, $written))) === FALSE)
+            if (($result = fwrite($fp, substr($msg, $written))) === FALSE)
             {
                 break;
             }
@@ -258,5 +258,47 @@ class Log implements LoggerInterface {
     }
 
     //--------------------------------------------------------------------
+
+    /**
+     * Replaces any placeholders in the message with variables
+     * from the context, as well as a few special items like:
+     *
+     *  {ip_address}
+     *
+     * @param       $message
+     * @param array $context
+     *
+     * @return string
+     */
+    public function interpolate($message, array $context = [])
+    {
+        // build a replacement array with braces around the context keys
+        $replace = array();
+
+        foreach ($context as $key => $val)
+        {
+            // todo - sanitize input before writing to file
+            $replace['{' . $key . '}'] = $val;
+        }
+
+        // Add special placeholders
+        // todo - get actual IP address
+        // todo - implement current_url() method
+        $replace['{ip_address}'] = '127.0.01';
+        $replace['{current_url}'] = 'current_url';
+        $replace['{post_vars}'] = '$_POST: '. print_r($_POST, true);
+        $replace['{get_vars}'] = '$_GET: '. print_r($_GET, true);
+
+        if (isset($_SESSION))
+        {
+            $replace['{session_vars}'] = '$_SESSION: '. print_r($_SESSION, true);
+        }
+
+        // interpolate replacement values into the message and return
+        return strtr($message, $replace);
+    }
+
+    //--------------------------------------------------------------------
+
 
 }
