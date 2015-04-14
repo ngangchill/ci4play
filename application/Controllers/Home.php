@@ -24,6 +24,8 @@ class Home extends Controller {
         var_dump( config_item('migration.enabled') );
 
         echo "<h2>Home Controller</h2>";
+
+        log_message('emergency', 'We {swear} made it.', ['swear' => 'fracking']);
 	}
 }
 

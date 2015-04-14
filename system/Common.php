@@ -16,3 +16,20 @@ if (! function_exists('config_item'))
 }
 
 //--------------------------------------------------------------------
+
+if (! function_exists('log_message'))
+{
+    /**
+     * Logs a message to the log files.
+     *
+     * @param       $level
+     * @param       $message
+     * @param array $context
+     */
+    function log_message($level, $message, array $context=[])
+    {
+        \CodeIgniter\CI::getInstance()->logger->log($level, $message, $context);
+    }
+}
+
+//--------------------------------------------------------------------

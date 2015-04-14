@@ -31,6 +31,11 @@ class Config implements ConfigInterface {
         $file = substr($name, 0, strpos($name, '.') );
         $item = substr($name, strlen($file) + 1);
 
+        if (empty($file))
+        {
+            $file = 'config';
+        }
+
         if (empty($this->cache[$file]))
         {
             $this->loadFile($file);
@@ -54,6 +59,25 @@ class Config implements ConfigInterface {
         $item = $this->item($name);
 
         return rtrim($item, '/ ') .'/';
+    }
+
+    //--------------------------------------------------------------------
+
+    /**
+     * Returns an array of all config items within a file.
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function file($name)
+    {
+        if (! array_key_exists($name, $this->cache))
+        {
+            $this->loadFile($name);
+        }
+
+        return $this->cache[$name];
     }
 
     //--------------------------------------------------------------------

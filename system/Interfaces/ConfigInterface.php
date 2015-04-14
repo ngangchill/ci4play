@@ -33,6 +33,17 @@ interface ConfigInterface {
     //--------------------------------------------------------------------
 
     /**
+     * Returns an array of all config items within a file.
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function file($name);
+
+    //--------------------------------------------------------------------
+
+    /**
      * Sets a single item's value for use during run-time only
      * Not responsible for saving it to file.
      *

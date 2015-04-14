@@ -24,6 +24,7 @@ $config['services'] = [
     // The core CodeIgniter files
     'benchmark'     => '\CodeIgniter\Benchmark',
     'config'        => '\CodeIgniter\Config',
+    'logger'        => '\CodeIgniter\Log'
 
     // Your custom files can be added here.
 ];
