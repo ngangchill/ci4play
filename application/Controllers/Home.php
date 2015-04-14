@@ -21,8 +21,9 @@ class Home extends Controller {
 	 */
 	public function index()
 	{
-        echo 'here';
-//		$this->load->view('welcome_message');
+        var_dump( config_item('migration.enabled') );
+
+        echo "<h2>Home Controller</h2>";
 	}
 }
 

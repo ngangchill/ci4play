@@ -26,7 +26,7 @@
  *  Load the global functions
  * ------------------------------------------------------
  */
-//    require_once(BASEPATH.'Core/Common.php');
+    require_once(BASEPATH.'Common.php');
 
 /*
  * ------------------------------------------------------
