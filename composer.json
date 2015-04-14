@@ -1,0 +1,14 @@
+{
+  "name": "CodeIgniter 4 Experimental Concept",
+  "version": "4.0-alpha",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "application/",
+      "CodeIgniter\\": "system/Classes/"
+    }
+  },
+  "require": {
+    "php": ">=5.4"
+  }
+}

@@ -1,0 +1,20 @@
+# OS-specific files
+.DS_Store
+.thumbs
+
+# IDE Files
+.idea/*
+*.sublime-workspace
+*.sublime-project
+
+# Development Settings
+application/config/development/*
+
+# Composer installs
+vendor/*
+
+# Temporary Files
+writable/logs/*
+!writable/logs/.gitkeep
+writable/cache/*
+!writable/cache/.gitkeep
