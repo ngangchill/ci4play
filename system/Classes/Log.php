@@ -201,6 +201,18 @@ class Log implements LoggerInterface {
             return false;
         }
 
+        // Parse our placeholders
+        $message = $this->interpolate($message, $context);
+
+        // Fire off an event first, and allow it to tell us
+        // whether or not we need to log to file.
+        if (! Events::trigger('log-'. $level, ['message' => $message]))
+        {
+            // We still executed properly
+            return true;
+        }
+
+        // Still here? Then write to the log file.
         $filepath = $this->log_path .'log-'. date('Y-m-d'). '.'. $this->file_ext;
 
         $msg = '';
@@ -234,7 +246,7 @@ class Log implements LoggerInterface {
             $date = date($this->date_format);
         }
 
-        $msg .= strtoupper($level) .' - '. $date .' --> '. $this->interpolate($message, $context) ."\n";
+        $msg .= strtoupper($level) .' - '. $date .' --> '. $message ."\n";
 
         flock($fp, LOCK_EX);
 
