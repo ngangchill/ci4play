@@ -1,6 +1,6 @@
 <?php namespace CodeIgniter\Interfaces;
 
-class ConfigInterface {
+interface ConfigInterface {
 
     /**
      * Grabs the value of a single item.
@@ -16,7 +16,7 @@ class ConfigInterface {
      *
      * @return mixed
      */
-    public function item($name) {}
+    public function item($name);
 
     //--------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ class ConfigInterface {
      *
      * @return mixed
      */
-    public function slashItem($name) {}
+    public function slashItem($name);
 
     //--------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ class ConfigInterface {
      *
      * @return self
      */
-    public function setItem($name, $value=null) {}
+    public function setItem($name, $value=null);
 
     //--------------------------------------------------------------------
 

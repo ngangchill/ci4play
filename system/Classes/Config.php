@@ -1,6 +1,8 @@
 <?php namespace CodeIgniter;
 
-class Config {
+use CodeIgniter\Interfaces\ConfigInterface;
+
+class Config implements ConfigInterface {
 
     /**
      * Acts as a cache for loaded config files.
