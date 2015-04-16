@@ -31,6 +31,13 @@ class Router implements RouterInterface {
      */
     protected $collection = null;
 
+    /**
+     * Is prepended to class names when we're calling them.
+     *
+     * @var string
+     */
+    protected $namespace = '\App\Controllers\\';
+
     //--------------------------------------------------------------------
 
     public function __construct()
@@ -142,11 +149,15 @@ class Router implements RouterInterface {
         {
             list($controller, $method) = explode('@', $route[1]);
 
+            if (strpos($controller, '\\') === false)
+            {
+                $controller = $this->namespace . $controller;
+            }
+
             $class = new $controller();
 
             return call_user_func_array([$class, $method], $route[2]);
         }
-
 
     }
 
