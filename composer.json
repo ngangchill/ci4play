@@ -5,7 +5,9 @@
   "autoload": {
     "psr-4": {
       "App\\": "application/",
-      "CodeIgniter\\": ["system/", "system/Classes/"]
+      "CodeIgniter\\": "system/Classes/",
+      "CodeIgniter\\Routes\\": "system/Classes/Router/",
+      "CodeIgniter\\Interfaces\\" : "system/Interfaces/"
     }
   },
   "require": {

@@ -35,7 +35,9 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+
+use CodeIgniter\CI;
+use CodeIgniter\Router\RouteCollection;
 
 /*
 | -------------------------------------------------------------------------
@@ -85,9 +87,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'welcome';
-$route['404_override'] = '';
-$route['translate_uri_dashes'] = FALSE;
+
+$route = CI::getInstance()->routes;
+
+// Route Settings
+$route->default_controller = 'welcome';
+$route->override404 = '';
+$route->translate_uri_dashes = false;
+$route->use_magic_routing = false;
+
+
+// Actual Routes
+$route->any('twilight/zone', '\App\Controllers\Welcome@index');
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

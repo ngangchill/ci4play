@@ -2,7 +2,7 @@
 
 use CodeIgniter\Controller;
 
-class Home extends Controller {
+class Welcome extends Controller {
 
 	/**
 	 * Index Page for this controller.

@@ -221,8 +221,6 @@ class CI {
      */
     public function __get($alias)
     {
-        $alias = strtolower($alias);
-
         // Does an instance already exist?
         if (! array_key_exists($alias, $this->instances))
         {

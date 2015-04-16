@@ -73,18 +73,8 @@ $BM->mark('loading_time:_base_classes_start');
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-//$RTR = $ci->router;
-
-//--------------------------------------------------------------------
-// Try to fire the controller - placeholder code, of course
-//--------------------------------------------------------------------
-
-$controller_class = '\App\Controllers\Home';
-
-$controller = new $controller_class( $ci );
-
-// Run it!
-$controller->index();
+$RTR = $ci->router;
+$RTR->route( $_SERVER['REQUEST_URI'] );
 
 echo "Executed in ". $BM->elapsed_time('total_execution_time_start', null, 7) ." seconds";
 

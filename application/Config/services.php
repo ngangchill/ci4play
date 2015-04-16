@@ -22,9 +22,11 @@ $config['services'] = [
     //--------------------------------------------------------------------
 
     // The core CodeIgniter files
-    'benchmark'     => '\CodeIgniter\Benchmark',
-    'config'        => '\CodeIgniter\Config',
-    'logger'        => '\CodeIgniter\Log'
+    'benchmark'         => '\CodeIgniter\Benchmark',
+    'config'            => '\CodeIgniter\Config',
+    'logger'            => '\CodeIgniter\Log',
+    'router'            => '\CodeIgniter\Router\Router',
+    'routes'            => '\CodeIgniter\Router\RouteCollection',
 
     // Your custom files can be added here.
 ];
