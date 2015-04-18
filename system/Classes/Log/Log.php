@@ -1,6 +1,6 @@
-<?php namespace CodeIgniter;
+<?php namespace CodeIgniter\Log;
 
-use CodeIgniter\Interfaces\LoggerInterface;
+use CodeIgniter\Events\Events;
 
 class Log implements LoggerInterface {
 

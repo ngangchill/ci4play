@@ -1,7 +1,5 @@
 <?php namespace CodeIgniter\Router;
 
-use CodeIgniter\Interfaces\RouteCollectionInterface;
-
 /**
  * Class RouteCollection
  *

@@ -1,6 +1,4 @@
-<?php namespace CodeIgniter;
-
-use CodeIgniter\Interfaces\ConfigInterface;
+<?php namespace CodeIgniter\Config;
 
 class Config implements ConfigInterface {
 

@@ -202,6 +202,46 @@ class CI {
 
     //--------------------------------------------------------------------
 
+    /**
+     * Allows you to create a new instance of an object as a singleton,
+     * passing in arguments.
+     *
+     * @param $alias
+     * @return mixed
+     */
+    public function single($alias)
+    {
+        // Die if an instance of this already exists
+        if (! empty($this->instances[$alias]))
+        {
+            throw new \RuntimeException("An instance of alias '{$alias}' already exists. Single() can only create the first instances.");
+        }
+
+        // Die if we don't know what class to use.
+        if (empty($this->providers[$alias]))
+        {
+            throw new \InvalidArgumentException('Unable to find class with alias: '. $alias);
+        }
+
+        // Collect any additional params to be sent to the method
+        $params = func_get_args();
+        $params = array_pop($params);
+
+        if (! is_array($params))
+        {
+            $params = [$params];
+        }
+
+        // Create a new instance of the class.
+        $reflectionObject = new \ReflectionClass($this->providers[$alias]);
+        $this->instances[$alias] = $reflectionObject->newInstanceArgs($params);
+
+        return $this->instances[$alias];
+    }
+
+    //--------------------------------------------------------------------
+
+
 
     //--------------------------------------------------------------------
     // Magic

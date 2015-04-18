@@ -31,7 +31,7 @@
  */
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-use \CodeIgniter\Events;
+use \CodeIgniter\Events\Events;
 
 //--------------------------------------------------------------------
 // EVENTS

@@ -1,7 +1,6 @@
 <?php namespace CodeIgniter\Router;
 
 use CodeIgniter\CI;
-use CodeIgniter\Interfaces\RouterInterface;
 
 /**
  * Class Router
@@ -16,13 +15,6 @@ use CodeIgniter\Interfaces\RouterInterface;
  * @package CodeIgniter\Router
  */
 class Router implements RouterInterface {
-
-    /**
-     * Link to CI object.
-     *
-     * @var
-     */
-    protected $ci;
 
     /**
      * Link to the current RouteCollection.
@@ -40,11 +32,9 @@ class Router implements RouterInterface {
 
     //--------------------------------------------------------------------
 
-    public function __construct()
+    public function __construct( RouteCollectionInterface $collection)
     {
-        $this->ci = CI::getInstance();
-
-        $this->collection =& $this->ci->routes;
+        $this->collection =& $collection;
     }
 
     //--------------------------------------------------------------------
@@ -138,7 +128,8 @@ class Router implements RouterInterface {
      * @return bool|mixed
      */
     public function dispatch($route)
-    {
+    {;
+        // Any callable method, like closure, static, etc.
         if (is_callable($route[1]))
         {
             return call_user_func_array($route[1], $route[2]);
@@ -147,21 +138,34 @@ class Router implements RouterInterface {
         // Is it a controller@method combo?
         if (strpos($route[1], '@') !== false)
         {
-            list($controller, $method) = explode('@', $route[1]);
+            list($class_name, $method) = explode('@', $route[1]);
 
-            if (strpos($controller, '\\') === false)
+            $ns_class = $class_name;
+
+            if (strpos($class_name, '\\') === false)
             {
-                $controller = $this->namespace . $controller;
+                $ns_class = $this->namespace . $class_name;
             }
 
-            $class = new $controller();
+            if (! class_exists($ns_class))
+            {
+                throw new \RuntimeException('Unable to locate Controller: '. $ns_class);
+            }
+
+            $class = new $ns_class();
 
             return call_user_func_array([$class, $method], $route[2]);
         }
 
+        /*
+         * Still here? Then we can't find a namespaced controller that
+         * matches any of our routes. If they'll let us, try to locate
+         * it the old fashioned way: by finding a matching controller name
+         * with the appropriate method.
+         */
+
     }
 
     //--------------------------------------------------------------------
-
 
 }

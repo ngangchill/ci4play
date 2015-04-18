@@ -73,9 +73,10 @@ $BM->mark('loading_time:_base_classes_start');
  *  Instantiate the routing class and set the routing
  * ------------------------------------------------------
  */
-$RTR = $ci->router;
+$RTR = $ci->single('router', $ci->routes);
 $RTR->route( $_SERVER['REQUEST_URI'] );
 
-echo "Executed in ". $BM->elapsed_time('total_execution_time_start', null, 7) ." seconds";
+$memory = round(memory_get_usage() / 1024 / 1024, 2). 'MB';
+echo "Executed in ". $BM->elapsed_time('total_execution_time_start', null, 7) ." seconds, using {$memory}";
 
 

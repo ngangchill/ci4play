@@ -1,4 +1,4 @@
-<?php namespace CodeIgniter\Interfaces;
+<?php namespace CodeIgniter\Router;
 
 interface RouterInterface {
 
