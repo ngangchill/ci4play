@@ -7,8 +7,14 @@
 ### Routing
 Working on the routing currently. Exploring ways to make it so that you can easiliy route to any namespaced controller (working) even if brought in via a Composer package. Also needs to support traditional CodeIgniter controllers and "modules" (or packages with the additional benefit of routing to classes within).
 
+Am thinking that we can require all classes to be namespaced. This could mean that it's namespaced in App\Controllers, or a package brought down through GitHub, or another folder they've given a namespace to. This gets rid of the need to route to any strange modules, etc. The challenge then is to provide ways to load helpers, configs and language files from namespaced packages. But I think this can be handled by reading in the compser.json file ourself to get access to namespace locations.
+
 ### Minimal Core
 Need to explore ways that certain portions of the application can be optionally loaded. For example, when doing a CLI-only service, you don't need features like caching or sessions, so you shouldn't require the overhead of loading them. Could handle this via "middleware" but that doesn't feel like CodeIgniter, though it might prove to be the easiest method to handle it.
+
+Am thinking this could be handled through different "app boot files". Basically, the index.php file would have a  little detection that determines if it is cli or a web request, and then fires off different bootstrap files from there. Could also be custom bootstrap files if someone really needs to customize differently. 
+
+**Is this even worth it?** 
 
 ## Current State and Overview
 While this codebase is a huge departure from traditional CodeIgniter, the goals are the same as what is currently liked about CodeIgniter 2 and 3, namely somewhat minimalistic, easy to learn and use, and fast. Where possible, I'm striving to keep the "feel" of CodeIgniter while modernizing the codebase and making it possible (and encouraging) the ability to play nice with other modern frameworks where possible.
