@@ -124,12 +124,13 @@ class CI {
      *
      * @return $this
      */
-    public function unregister($alias)
+    public function unregister($alias, $remove_instances=false)
     {
         $alias = strtolower($alias);
 
-        if (array_key_exists($alias, $this->instances))
+        if ($remove_instances && array_key_exists($alias, $this->instances))
         {
+            $this->instances[$alias] = null;
             unset($this->instances[$alias]);
         }
 
@@ -142,6 +143,8 @@ class CI {
 
     /**
      * Registers an instantiated class as a Service Provider.
+     *
+     * todo Register savedInstance class with the providers array.
      *
      * @param $alias
      * @param $class
