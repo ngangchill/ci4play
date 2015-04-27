@@ -30,3 +30,5 @@ $config['services'] = [
 
     // Your custom files can be added here.
 ];
+
+return $config;

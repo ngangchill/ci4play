@@ -40,10 +40,19 @@
 
 /*
  * ------------------------------------------------------
- *  Load the main Application class
+ *  Load the CI IoC container and get it ready for use.
  * ------------------------------------------------------
  */
-    $ci = CodeIgniter\CI::getInstance();
+    $config = require APPPATH .'Config/services.php';
+
+    if (empty($config) || empty($config['services']) || ! is_array($config['services']))
+    {
+        throw new \RuntimeException('The Service Providers configuration file does not contain a proper array.');
+    }
+
+    $ci = CodeIgniter\CI::getInstance( $config['services'] );
+
+    unset($config);
 
 /*
  * ------------------------------------------------------

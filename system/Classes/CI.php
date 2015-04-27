@@ -51,49 +51,38 @@ class CI {
      * The constructor is kept private to ensure that
      * this class can only be used as a singleton DI container.
      */
-    private function __construct() {}
+    private function __construct( array $config=[] )
+    {
+        $this->providers = $config;
+    }
 
     //--------------------------------------------------------------------
 
     /**
      * Returns the singleton instance of this class.
+     *
+     * Provides a simple way to access the class elsewhere in the
+     * application. Care should be used, though, as this could simply
+     * defer the dependency onto this container and still keep your
+     * class dependant on this CI class.
+     *
+     * A preferred way would be to request the CI class in your
+     * classes constructor.
+     *
+     * Example:
+     *      public function __construct(CI $ci)
+     *      {
+     *          $this->ci = $ci;
+     *      }
      */
-    public static function getInstance()
+    public static function getInstance( array $config=[] )
     {
         if (empty(static::$instance))
         {
-            static::$instance = new CI();
-            static::$instance->loadProviders();
+            static::$instance = new CI( $config );
         }
 
         return static::$instance;
-    }
-
-    //--------------------------------------------------------------------
-
-
-    /**
-     * Responsible for registering all service providers with
-     * the Dependency Injection container. The list of services can
-     * be found in application/config/services.php
-     */
-    public function loadProviders()
-    {
-        // Load our provider map
-        if (! file_exists(APPPATH .'Config/services.php'))
-        {
-            throw new \RuntimeException('The Service Providers configuration file cannot be found.');
-        }
-
-        include APPPATH .'Config/services.php';
-
-        if (empty($config) || empty($config['services']))
-        {
-            throw new \RuntimeException('The Service Providers configuration file does not contain a proper array.');
-        }
-
-        $this->providers = $config['services'];
-        unset($config);
     }
 
     //--------------------------------------------------------------------
@@ -181,23 +170,39 @@ class CI {
      * returns a new one.
      *
      * @param $alias
+     * @param bool $use_singletons
+     *
      * @return null
      */
-    public function make($alias)
+    public function make($alias, $use_singletons=false)
     {
+        $alias = strtolower($alias);
+
         if (! array_key_exists($alias, $this->providers))
         {
-            return null;
+            throw new \InvalidArgumentException('No Service is registered for alias: '. $alias);
         }
 
-        if (! class_exists($this->providers[$alias], true))
+        // The provider could be either a string (namespaced class)
+        // or a Closure that returns an instance of the desired class.
+        $service = $this->providers[$alias];
+
+        if (is_string($service))
         {
-            throw new \RuntimeException('Unable to locate the Service Provider: '. $this->providers[$alias] );
+            if (! class_exists($service, true))
+            {
+                throw new \RuntimeException('Unable to locate the Service Provider: '. $this->providers[$alias] );
+            }
+
+            return $this->inject($service, $use_singletons);
         }
 
-        $class = new $this->providers[$alias]( $this );
+        else if (is_callable($service))
+        {
+            return $service( $this );
+        }
 
-        return $class;
+        return null;
     }
 
     //--------------------------------------------------------------------
@@ -211,10 +216,12 @@ class CI {
      */
     public function single($alias)
     {
-        // Die if an instance of this already exists
-        if (! empty($this->instances[$alias]))
+        $alias = strtolower($alias);
+
+        // Return the existing object if it exists.
+        if (! empty($this->instances[$alias]) && is_object($this->instances[$alias]))
         {
-            throw new \RuntimeException("An instance of alias '{$alias}' already exists. Single() can only create the first instances.");
+            return $this->instances[$alias];
         }
 
         // Die if we don't know what class to use.
@@ -223,18 +230,9 @@ class CI {
             throw new \InvalidArgumentException('Unable to find class with alias: '. $alias);
         }
 
-        // Collect any additional params to be sent to the method
-        $params = func_get_args();
-        $params = array_pop($params);
+        $instance = $this->make($alias, true);
 
-        if (! is_array($params))
-        {
-            $params = [$params];
-        }
-
-        // Create a new instance of the class.
-        $reflectionObject = new \ReflectionClass($this->providers[$alias]);
-        $this->instances[$alias] = $reflectionObject->newInstanceArgs($params);
+        $this->instances[$alias] =& $instance;
 
         return $this->instances[$alias];
     }
@@ -261,15 +259,77 @@ class CI {
      */
     public function __get($alias)
     {
-        // Does an instance already exist?
-        if (! array_key_exists($alias, $this->instances))
-        {
-            $this->instances[$alias] = $this->make($alias);
-        }
-
-        return $this->instances[$alias];
+        return $this->single($alias);
     }
     
     //--------------------------------------------------------------------
 
+    /**
+     * Determines the classes needed, creates instances (or uses existing
+     * instances, if exists) to pass in constructor and returns
+     * a new instance of the desired service.
+     *
+     * @param $service
+     *
+     * @return null|object
+     */
+    protected function inject($service, $single=false)
+    {
+        $mirror = new \ReflectionClass($service);
+        $constructor = $mirror->getConstructor();
+
+        $params = null;
+
+        if (empty($constructor))
+        {
+            return new $service();
+        }
+
+        $params = $this->getParams($constructor, $single);
+
+        // No params means we simply create a new
+        // instance of the class and return it...
+        if (is_null($params))
+        {
+            return new $service();
+        }
+
+        // Still here - then return an instance
+        // with those params as arguments
+        return $mirror->newInstanceArgs($params);
+    }
+
+    //--------------------------------------------------------------------
+
+    /**
+     * Given a reflection method, will get or create an array of objects
+     * ready to be inserted into the class' constructor.
+     *
+     * If $single is true, will return a singleton version of dependencies
+     * else will create a new class.
+     *
+     * @param \ReflectionMethod $mirror
+     * @param bool $single
+     *
+     * @return array
+     */
+    protected function getParams(\ReflectionMethod $mirror, $single=false)
+    {
+        $params = [];
+
+        foreach ($mirror->getParameters() as $param)
+        {
+            $alias = strtolower($param->name);
+            $class = $param->getClass()->name;
+
+            // Is this a mapped alias?
+            if (! empty($this->providers[$alias]))
+            {
+                $params[] = $single ? $this->single($alias) : $this->make($alias);
+                continue;
+            }
+        }
+
+        return $params;
+    }
 }
