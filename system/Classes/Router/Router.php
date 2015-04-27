@@ -17,6 +17,28 @@ use CodeIgniter\CI;
 class Router implements RouterInterface {
 
     /**
+     * The namespace of the class used.
+     *
+     * @var
+     */
+    public $namespace;
+
+    /**
+     * Name of the controller class,
+     * without namespace.
+     *
+     * @var
+     */
+    public $class;
+
+    /**
+     * Name of method fired off.
+     *
+     * @var
+     */
+    public $method;
+
+    /**
      * Link to the current RouteCollection.
      *
      * @var null
@@ -28,13 +50,13 @@ class Router implements RouterInterface {
      *
      * @var string
      */
-    protected $namespace = '\App\Controllers\\';
+    protected $default_namespace = '\App\Controllers\\';
 
     //--------------------------------------------------------------------
 
-    public function __construct( RouteCollectionInterface $collection)
+    public function __construct( RouteCollectionInterface $routes)
     {
-        $this->collection =& $collection;
+        $this->collection =& $routes;
     }
 
     //--------------------------------------------------------------------
@@ -86,6 +108,10 @@ class Router implements RouterInterface {
      */
     public function parseRoute($uri, array $routes=[])
     {
+        $return     = [];
+        $to         = '';
+        $matches    = [];
+
         if (! count($routes))
         {
             return false;
@@ -94,23 +120,36 @@ class Router implements RouterInterface {
         // Do we have an exact match?
         if (array_key_exists($uri, $routes))
         {
-            return [ $uri, $routes[$uri], [] ];
+            $to = $routes[$uri];
         }
 
-        // Look for one matching with regular expressions.
-        foreach ($routes as $key => $val)
+        else
         {
-            // Does the regex match?
-            if (preg_match('#^'. $key .'$#', $uri, $matches))
+            // Look for one matching with regular expressions.
+            foreach ($routes as $key => $val)
             {
-                // Remove the original string from the matches array.
-                array_shift($matches);
+                // Does the regex match?
+                if (preg_match('#^'. $key .'$#', $uri, $matches))
+                {
+                    // Remove the original string from the matches array.
+                    array_shift($matches);
 
-                return [$uri, $val, $matches];
+                    $to = $val;
+                }
             }
         }
 
-        return false;
+        if (empty($to))
+        {
+            return false;
+        }
+
+        die(var_dump($to));
+
+        // Analyse the $to to find our class, namespace, etc.
+        $namespace  = $this->default_namespace;
+
+        return [$uri, $to, $matches];
     }
 
     //--------------------------------------------------------------------
@@ -128,7 +167,7 @@ class Router implements RouterInterface {
      * @return bool|mixed
      */
     public function dispatch($route)
-    {;
+    {
         // Any callable method, like closure, static, etc.
         if (is_callable($route[1]))
         {
@@ -141,16 +180,31 @@ class Router implements RouterInterface {
             list($class_name, $method) = explode('@', $route[1]);
 
             $ns_class = $class_name;
+            $namespace = $this->default_namespace;
 
             if (strpos($class_name, '\\') === false)
             {
                 $ns_class = $this->namespace . $class_name;
             }
+            else
+            {
+                $segments = explode('\\', $class_name);
 
-            if (! class_exists($ns_class))
+                $class_name = array_pop($class_name);
+
+                $namespace = '\\'. implode('\\', $segments);
+            }
+
+            if (! class_exists($ns_class, true))
             {
                 throw new \RuntimeException('Unable to locate Controller: '. $ns_class);
             }
+
+            $this->namespace    = $namespace;
+            $this->class        = $class_name;
+            $this->method       = $method;
+
+            // todo handle placeholder translation from
 
             $class = new $ns_class();
 

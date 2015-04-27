@@ -19,8 +19,10 @@ class Welcome extends Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
-	public function index()
+	public function index($num=null)
 	{
+        var_dump($num);
+
         var_dump( config_item('migration.enabled') );
 
         echo "<h2>Home Controller</h2>";

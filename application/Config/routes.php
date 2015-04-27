@@ -98,7 +98,7 @@ $route->use_magic_routing = false;
 
 
 // Actual Routes
-$route->any('twilight/zone', 'Welcome@index');
+$route->any('twilight/zone/{num}', 'welcome/index/$1');
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
