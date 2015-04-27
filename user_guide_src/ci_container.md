@@ -44,7 +44,7 @@ Looking at our list of services above, we decide we need a new Router. This clas
 
 Altogether it would look something like: 
 
-	class RouteCollection { } 
+	class RouteCollection implements RouteCollectionInterface { } 
 	
 	class Router {
 		protected $collection;
