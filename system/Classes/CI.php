@@ -320,7 +320,6 @@ class CI {
         foreach ($mirror->getParameters() as $param)
         {
             $alias = strtolower($param->name);
-            $class = $param->getClass()->name;
 
             // Is this a mapped alias?
             if (! empty($this->providers[$alias]))
@@ -328,6 +327,16 @@ class CI {
                 $params[] = $single ? $this->single($alias) : $this->make($alias);
                 continue;
             }
+
+            // Is this a normal class we can give them?
+            $class = $param->getClass()->name;
+
+            if (class_exists($class))
+            {
+                $params[] = new $class();
+            }
+
+            $params[] = null;
         }
 
         return $params;
