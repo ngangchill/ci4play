@@ -50,7 +50,7 @@ Altogether it would look something like:
 		protected $collection;
 	
 		// The parameter name must match the alias name. 
-		public function __construct(\CodeIgniter\Router\RouteCollection $routes)
+		public function __construct(RouteCollectionInterface $routes)
 		{ 
 			 $this->collection = $routes;
 		}
