@@ -29,7 +29,7 @@ While this codebase is a huge departure from traditional CodeIgniter, the goals 
 ### Composer and Services
 [Composer][1] forms the heart of the framework, providing the autoloading of all classes. Both the `system` and `application` folders live in their own namespaces, making extending and overriding core framework features a breeze.
 
-There is a `CI` object that acts as a dependency injection container for common classes. It provides a `getInstance()` method that returns the CI singleton.  Classes can be defined in `application/Config/services.php` along with an alias they are referred as. Those classes can then be accessed through the CI object as a property. 
+There is a `CI` object that acts as a [dependency injection container][2] for common classes. It provides a `getInstance()` method that returns the CI singleton.  Classes can be defined in `application/Config/services.php` along with an alias they are referred as. Those classes can then be accessed through the CI object as a property. 
 
 For example, the 'CodeIgniter\Log' class is aliased as `logger` in the config file. You can access that from within any class in the application like so: 
 
@@ -68,3 +68,4 @@ The Router is being reworked with the following goals:
 
 
 [1]:	http://getcomposer.org
+[2]:	https://github.com/lonnieezell/ci4play/blob/master/user_guide_src/ci_container.md
