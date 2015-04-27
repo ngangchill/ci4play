@@ -69,4 +69,26 @@ Alternatively, you can access the class as a parameter of the CI object. This wi
 
 	$bm = $ci->benchmark;
 
- 
+## Registering New Class/Alias Pairs
+During run time, you can add alias and class pairs to the CI object in addition to those already stored in the config file. This is done with the `register()` method. The first parameter is the alias to use. The second parameter is the fully namespaced class name or an anonymous function that will return an instance of the class.
+
+	$ci->register('example', '\MyApp\Libraries\Example');
+	$ci->register('example', function ($ci) {
+		 return new \MyApp\Libraries\Example();
+	});
+
+## Unregistering Classes
+During runtime, you can remove any registered aliases with the `unregister()` method. The first parameter is the alias to remove. The second parameter is a boolean representing whether any existing instances of this class cached in the CI object should also be deleted.
+
+	// Will not delete existing instance
+	$ci->unregister('example');
+	 
+	// Will delete existing instance
+	$ci->unregister('example', true);
+
+## Registering Existing Instances
+If you already have an instance of a class that you would like to register with the container, and have it be used with the `single()` methods, then you can use the `saveInstance()` method to save that instance to the class. The first parameter is the alias to use. The second parameter is the instance to save. This will overwrite anything already at that instance. 
+
+	$class = new MockClass();
+	$ci->saveInstance('example', $class);
+
